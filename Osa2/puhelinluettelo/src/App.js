@@ -144,11 +144,17 @@ const App = () => {
         .then(returnedPerson => {
           setPersons(persons.concat(returnedPerson))
           setShowPersons(persons.concat(returnedPerson))
+          setNotifMessage('Added ' + newName) //ilmoitetaan onnistuneesta lisäyksestä käyttäjälle
+          setTimeout(() => {
+            setNotifMessage(null)
+          }, 4000)
         })
-      setNotifMessage('Added ' + newName) //ilmoitetaan onnistuneesta lisäyksestä käyttäjälle
-      setTimeout(() => {
-        setNotifMessage(null)
-      }, 4000)
+        .catch(error => {
+          setErrorMessage(error.response.data.error)
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 4000)
+        })
     }
     setNewName('')
     setNewNumber('')
