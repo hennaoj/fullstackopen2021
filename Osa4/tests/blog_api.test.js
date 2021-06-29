@@ -48,6 +48,7 @@ test('the blog identifier is id not _id', async () => {
 
 describe('blog adding', () => {
   beforeEach(async () => {
+    //luodaan testikäyttäjä ennen jokaista testiä
     await User.deleteMany({})
 
     const passwordHash = await bcrypt.hash('hello', 10)
@@ -63,14 +64,15 @@ describe('blog adding', () => {
           likes: 0
         }
 
+      //logataan testikäyttäjä sisään ja talletetaan saatu token
       const user = {username: 'root', password: 'hello'}
       const response = await api
         .post('/api/login')
         .send(user)
-
       const token = ('bearer ' + response.body.token)
-      //console.log(token)
 
+
+      //lisätään uusi blogi tokenin avulla
       await api
         .post('/api/blogs')
         .send(newBlog)
@@ -81,10 +83,12 @@ describe('blog adding', () => {
       const blogsAtEnd = await Blog.find({})
       const blogsAtEndJSON = blogsAtEnd.map(blog => blog.toJSON())
 
+      //tarkistetaan, että blogilista on kasvanut yhdellä
       expect(blogsAtEndJSON).toHaveLength(initialBlogs.length + 1)
 
       const titles = blogsAtEndJSON.map(r => r.title)
 
+      //tarkastetaan, että uuden blogin nimi löytyy tietokannan listalta
       expect(titles).toContain(newBlog.title)
   })
 
@@ -95,13 +99,14 @@ describe('blog adding', () => {
           url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html"
       } 
 
+      //logataan testikäyttäjä sisään ja talletetaan saatu token
       const user = {username: 'root', password: 'hello'}
       const response = await api
         .post('/api/login')
         .send(user)
-
       const token = ('bearer ' + response.body.token)
 
+      //lisätään uusi blogi tokenin avulla
       await api
         .post('/api/blogs')
         .send(newBlog)
@@ -114,6 +119,7 @@ describe('blog adding', () => {
 
       var length = blogsAtEndJSON.length
 
+      //tarkistetaan, että tietokannan viimeisen (eli lisätyn) blogin tykkäyksien määrä on 0
       expect(blogsAtEndJSON[length - 1].likes).toEqual(0)
       
   })
@@ -125,13 +131,14 @@ describe('blog adding', () => {
           likes: 7
       } 
 
+      //logataan testikäyttäjä sisään ja talletetaan saatu token
       const user = {username: 'root', password: 'hello'}
       const response = await api
         .post('/api/login')
         .send(user)
-
       const token = ('bearer ' + response.body.token)
 
+      //lisätään uusi blogi tokenin avulla
       await api
         .post('/api/blogs')
         .send(newBlog)
@@ -147,13 +154,14 @@ describe('blog adding', () => {
           likes: 7
       }
       
+      //logataan testikäyttäjä sisään ja talletetaan saatu token
       const user = {username: 'root', password: 'hello'}
       const response = await api
         .post('/api/login')
         .send(user)
-
       const token = ('bearer ' + response.body.token)
 
+      //lisätään uusi blogi tokenin avulla
       await api
         .post('/api/blogs')
         .send(newBlog)

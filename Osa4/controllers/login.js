@@ -6,7 +6,10 @@ const User = require('../models/user')
 loginRouter.post('/', async (request, response) => {
   const body = request.body
 
+  //etsitään pyyntöä vastaava käyttäjä
   const user = await User.findOne({ username: body.username })
+
+  //tarkistetaan salasana
   const passwordCorrect = user === null
     ? false
     : await bcrypt.compare(body.password, user.passwordHash)
@@ -22,6 +25,7 @@ loginRouter.post('/', async (request, response) => {
     id: user._id,
   }
 
+  //luodaan käyttäjälle token jwt:n ja ympäristömuuttujan SECRET avulla
   const token = jwt.sign(userForToken, process.env.SECRET)
 
   response

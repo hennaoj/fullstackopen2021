@@ -15,10 +15,12 @@ blogsRouter.post('/', async (request, response, next) => {
 
   const decodedtoken = jwt.verify(request.token, process.env.SECRET)
   
+  //varmistetaan tokenin oikeellisuus
   if (!request.token || !decodedtoken.id) {
     return response.status(401).json({error: 'token missing or invalid'})
   }
 
+  //haetaan käyttäjä id:n avulla
   const user = await User.findById(decodedtoken.id)
 
   const blog = new Blog({
@@ -29,7 +31,10 @@ blogsRouter.post('/', async (request, response, next) => {
     user: user._id
   })
 
+  //tallennetaan blogi tietokantaan
   const savedBlog = await blog.save()
+
+  //lisätään blogi myös käyttäjän tietoihin ja tallennetaan käyttäjä
   user.blogs = user.blogs.concat(savedBlog._id)
   await user.save()
   response.json(savedBlog.toJSON)
@@ -42,10 +47,11 @@ blogsRouter.delete('/:id', async (request, response) => {
 
   if (!token || !user) {
     return response.status(401).json({error: 'token missing or invalid'})
-  } else if (blog.user._id.toString() !== user.id) {
+  } else if (blog.user._id.toString() !== user.id) { //varmistetaan, että token ja blogin lisännyt käyttäjä mätsäävät
     return response.status(401).json({error: 'token does not match the user'})
   }
 
+  //poistetaan blogi tietokannasta
   await Blog.findByIdAndRemove(request.params.id)
   response.status(204).end()
 })
@@ -57,7 +63,8 @@ blogsRouter.put('/:id', async (request, response, next) => {
     author: body.author,
     url: body.url,
     title: body.title,
-    likes: body.likes
+    likes: body.likes,
+    user: request.user.id
   }
 
   const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
