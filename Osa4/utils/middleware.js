@@ -1,4 +1,5 @@
 const logger = require('./logger')
+const jwt = require('jsonwebtoken')
 
 const requestLogger = (request, response, next) => {
     //tulostaa konsoliin tiedot http-pyynnön tyypistä, paikasta ja sisällöstä
@@ -7,6 +8,23 @@ const requestLogger = (request, response, next) => {
     logger.info('Body: ', request.body)
     logger.info('---')
     next()
+}
+
+const tokenExtractor = (request, response, next) => {
+  // tokenin ekstraktoiva koodi
+  const authorization = request.get('authorization')
+  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
+    request.token = authorization.substring(7)
+  }
+  next()
+}
+
+const userExtractor = (request, response, next) => {
+  if (request.token !== undefined) {
+    const decodedtoken = jwt.verify(request.token, process.env.SECRET)
+    request.user = decodedtoken
+  }
+  next()
 }
 
 const unknownEndpoint = (request, response) => {
@@ -28,5 +46,7 @@ const errorHandler = (error, request, response, next) => {
 module.exports = {
     requestLogger,
     unknownEndpoint,
-    errorHandler
+    errorHandler,
+    tokenExtractor,
+    userExtractor
 }

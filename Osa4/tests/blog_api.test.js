@@ -1,8 +1,10 @@
+const bcrypt = require('bcrypt')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 const initialBlogs = [
     {
@@ -44,78 +46,248 @@ test('the blog identifier is id not _id', async () => {
     expect(response.body[0].id).toBeDefined()
 })
 
-test('blogs can be added to the database', async () => {
-    const newBlog = {
-        title: "TDD harms architecture",
-        author: "Robert C. Martin",
-        url: "http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html",
-        likes: 0
+describe('blog adding', () => {
+  beforeEach(async () => {
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('hello', 10)
+    const user = new User({ username: 'root',name: 'Tester', passwordHash })
+
+    await user.save()
+  })
+  test('blogs can be added to the database', async () => {
+      const newBlog = {
+          title: "TDD harms architecture",
+          author: "Robert C. Martin",
+          url: "http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html",
+          likes: 0
+        }
+
+      const user = {username: 'root', password: 'hello'}
+      const response = await api
+        .post('/api/login')
+        .send(user)
+
+      const token = ('bearer ' + response.body.token)
+      //console.log(token)
+
+      await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .set({Authorization: token})
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+      
+      const blogsAtEnd = await Blog.find({})
+      const blogsAtEndJSON = blogsAtEnd.map(blog => blog.toJSON())
+
+      expect(blogsAtEndJSON).toHaveLength(initialBlogs.length + 1)
+
+      const titles = blogsAtEndJSON.map(r => r.title)
+
+      expect(titles).toContain(newBlog.title)
+  })
+
+  test('if likes of added blog is not defined, it is set to 0', async () => {
+      const newBlog = {
+          title: "Type wars",
+          author: "Robert C. Martin",
+          url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html"
+      } 
+
+      const user = {username: 'root', password: 'hello'}
+      const response = await api
+        .post('/api/login')
+        .send(user)
+
+      const token = ('bearer ' + response.body.token)
+
+      await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .set({Authorization: token})
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      const blogsAtEnd = await Blog.find({})
+      const blogsAtEndJSON = blogsAtEnd.map(blog => blog.toJSON())
+
+      var length = blogsAtEndJSON.length
+
+      expect(blogsAtEndJSON[length - 1].likes).toEqual(0)
+      
+  })
+
+  test('if blog to be added has no title, responded with 400', async () => {
+      const newBlog = {
+          author: "Robert C. Martin",
+          url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
+          likes: 7
+      } 
+
+      const user = {username: 'root', password: 'hello'}
+      const response = await api
+        .post('/api/login')
+        .send(user)
+
+      const token = ('bearer ' + response.body.token)
+
+      await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .set({Authorization: token})
+        .expect(400)
+      
+  })
+
+  test('if blog to be added has no url, responded with 400', async () => {
+      const newBlog = {
+          title: "Dummy blog",
+          author: "Robert C. Martin",
+          likes: 7
       }
-    
-    await api
-      .post('/api/blogs')
-      .send(newBlog)
-      .expect(200)
+      
+      const user = {username: 'root', password: 'hello'}
+      const response = await api
+        .post('/api/login')
+        .send(user)
+
+      const token = ('bearer ' + response.body.token)
+
+      await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .set({Authorization: token})
+        .expect(400)
+      
+  })
+})
+
+describe('user/username will not be added', () => {
+  beforeEach(async () => {
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('hello', 10)
+    const user = new User({ username: 'root',name: 'Tester', passwordHash })
+
+    await user.save()
+  })
+
+  test('if the username is already taken', async () => {
+    const usersAtStart = await User.find({})
+
+    const newUser = {
+      username: 'root',
+      name: 'Superuser',
+      password: 'salasana'
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
       .expect('Content-Type', /application\/json/)
     
-    const blogsAtEnd = await Blog.find({})
-    const blogsAtEndJSON = blogsAtEnd.map(blog => blog.toJSON())
+    expect(result.body.error).toContain('`username` to be unique')
 
-    expect(blogsAtEndJSON).toHaveLength(initialBlogs.length + 1)
+    const usersAtEnd = await User.find({})
 
-    const titles = blogsAtEndJSON.map(r => r.title)
+    expect(usersAtEnd).toHaveLength(usersAtStart.length)
 
-    expect(titles).toContain(newBlog.title)
-})
+  })
 
-test('if likes of added blog is not defined, it is set to 0', async () => {
-    const newBlog = {
-        title: "Type wars",
-        author: "Robert C. Martin",
-        url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html"
-    } 
+  test('if the username is shorter than 3 letters', async () => {
+    const usersAtStart = await User.find({})
 
-    await api
-      .post('/api/blogs')
-      .send(newBlog)
-      .expect(200)
+    const newUser = {
+      username: 'rt',
+      name: 'Short',
+      password: 'hello'
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
       .expect('Content-Type', /application\/json/)
-
-    const blogsAtEnd = await Blog.find({})
-    const blogsAtEndJSON = blogsAtEnd.map(blog => blog.toJSON())
-
-    var length = blogsAtEndJSON.length
-
-    expect(blogsAtEndJSON[length - 1].likes).toEqual(0)
     
-})
+    expect(result.body.error).toContain('User validation failed: username')
+    expect(result.body.error).toContain(`is shorter than the minimum`)
 
-test('if blog to be added has no title, responded with 400', async () => {
-    const newBlog = {
-        author: "Robert C. Martin",
-        url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
-        likes: 7
-    } 
+    const usersAtEnd = await User.find({})
 
-    await api
-      .post('/api/blogs')
-      .send(newBlog)
+    expect(usersAtEnd).toHaveLength(usersAtStart.length)
+
+  })
+
+  test('if the username is not defined', async () => {
+    const usersAtStart = await User.find({})
+
+    const newUser = {
+      name: 'Nousername',
+      password: 'hello'
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
       .expect(400)
+      .expect('Content-Type', /application\/json/)
     
-})
+    expect(result.body.error).toContain('User validation failed: username')
+    expect(result.body.error).toContain('is required')
 
-test('if blog to be added has no url, responded with 400', async () => {
-    const newBlog = {
-        title: "Dummy blog",
-        author: "Robert C. Martin",
-        likes: 7
-    } 
+    const usersAtEnd = await User.find({})
 
-    await api
-      .post('/api/blogs')
-      .send(newBlog)
+    expect(usersAtEnd).toHaveLength(usersAtStart.length)
+
+  })
+
+  test('if the password is not defined', async () => {
+    const usersAtStart = await User.find({})
+
+    const newUser = {
+      username: 'nopassword',
+      name: 'foobar'
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
       .expect(400)
+      .expect('Content-Type', /application\/json/)
     
+    expect(result.body.error).toContain('password missing')
+
+    const usersAtEnd = await User.find({})
+
+    expect(usersAtEnd).toHaveLength(usersAtStart.length)
+
+  })
+
+  test('if the password is shorter than 3 letters', async () => {
+    const usersAtStart = await User.find({})
+
+    const newUser = {
+      username: 'shortpassword',
+      name: 'foobar',
+      password: 'no'
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+    
+    expect(result.body.error).toContain('password too short')
+
+    const usersAtEnd = await User.find({})
+
+    expect(usersAtEnd).toHaveLength(usersAtStart.length)
+
+  })
+
 })
 
 afterAll(() => {
