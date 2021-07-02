@@ -51,7 +51,7 @@ const App = () => {
 
       window.localStorage.setItem(
         'loggedBlogappUser', JSON.stringify(user)
-      ) 
+      )
       blogService.setToken(user.token)
       setUser(user)
       setUsername('')
@@ -60,12 +60,12 @@ const App = () => {
       setTimeout(() => {
         setNotification(null)
       }, 4000)
-      } catch (exception) {
-        setNotification('wrong username or password')
-        setTimeout(() => {
-          setNotification(null)
-        }, 4000)
-      }
+    } catch (exception) {
+      setNotification('wrong username or password')
+      setTimeout(() => {
+        setNotification(null)
+      }, 4000)
+    }
 
     console.log('logging in with', username, password)
   }
@@ -82,7 +82,7 @@ const App = () => {
           setNotification(null)
         }, 4000)
       })
-      .catch(error => {
+      .catch(() => {
         setNotification('new blogs require a title and an url')
         setTimeout(() => {
           setNotification(null)
@@ -117,14 +117,14 @@ const App = () => {
     <div>
       <Notification message={notification} />
       <h2>blogs</h2>
-        <div>
-          {user.name} logged in  <button onClick={logout}>logout</button>
-        </div>
-        {blogForm()}
+      <div>
+        {user.name} logged in  <button onClick={logout}>logout</button>
+      </div>
+      {blogForm()}
       <br></br>
       <div>
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} user={user}/> 
+          <Blog key={blog.id} blog={blog} user={user}/>
         )}
       </div>
     </div>

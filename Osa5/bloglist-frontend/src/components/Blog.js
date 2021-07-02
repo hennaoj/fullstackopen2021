@@ -1,7 +1,7 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react'
 import blogService from '../services/blogs'
 
-const Blog = ({blog, user}) => {
+const Blog = ({ blog, user }) => {
   const [showBlog, setShowBlog] = useState(false)
 
   const blogStyle = {
@@ -41,24 +41,24 @@ const Blog = ({blog, user}) => {
   return (
     <div>
       {showBlog === false ?
-      <div style={blogStyle}>
-      {blog.title} by {blog.author} <button onClick={toggleShow}>view</button> 
-      </div>
-      :
-      <div style={blogStyle}>
-      <p>{blog.title} by {blog.author} <button onClick={toggleShow}>hide</button></p>
-      <p>{blog.url}</p>
-      <p>likes {blog.likes} <button onClick={handleLike}>like</button></p>
-      <p>{blog.user.name}</p>
-      {user.username === blog.user.username ?
-      <button onClick={handleRemove}>remove</button>
-      :
-      null
+        <div style={blogStyle}>
+          {blog.title} by {blog.author} <button onClick={toggleShow}>view</button>
+        </div>
+        :
+        <div style={blogStyle}>
+          <p>{blog.title} by {blog.author} <button onClick={toggleShow}>hide</button></p>
+          <p>{blog.url}</p>
+          <p>likes {blog.likes} <button onClick={handleLike}>like</button></p>
+          <p>{blog.user.name}</p>
+          {user.username === blog.user.username ?
+            <button onClick={handleRemove}>remove</button>
+            :
+            null
+          }
+        </div>
       }
-      </div>
-      }
-    </div>  
+    </div>
   )
-  }
+}
 
 export default Blog

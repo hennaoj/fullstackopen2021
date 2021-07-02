@@ -9,7 +9,7 @@ const setToken = newToken => {
 
 const create = async newObject => {
   const config = {
-    headers: {Authorization: token},
+    headers: { Authorization: token },
   }
 
   const response = await axios.post(baseUrl, newObject, config)
@@ -23,7 +23,7 @@ const getAll = () => {
 
 const modify = async (id, newObject) => {
   const config = {
-    headers: {Authorization: token},
+    headers: { Authorization: token },
   }
   const response = await axios.put(`${baseUrl}/${id}`, newObject, config)
   return response.data
@@ -31,11 +31,11 @@ const modify = async (id, newObject) => {
 
 const destroy = async (id) => {
   const config = {
-    headers: {Authorization: token},
+    headers: { Authorization: token },
   }
   const response = await axios.delete(`${baseUrl}/${id}`, config)
   return response.data
 }
 
-const functionsToExport = {getAll, setToken, create, modify, destroy}
+const functionsToExport = { getAll, setToken, create, modify, destroy }
 export default functionsToExport
