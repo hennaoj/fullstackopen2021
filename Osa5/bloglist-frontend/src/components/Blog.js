@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import blogService from '../services/blogs'
 
-const Blog = ({ blog, user }) => {
+const Blog = ({ blog, user, handleLike }) => {
   const [showBlog, setShowBlog] = useState(false)
 
   const blogStyle = {
@@ -16,20 +16,6 @@ const Blog = ({ blog, user }) => {
     setShowBlog(!showBlog)
   }
 
-  const handleLike = () => {
-    const id = blog.id
-
-    const blogObject = {
-      title: blog.title,
-      author: blog.author,
-      user: blog.user.id,
-      url: blog.url,
-      likes: blog.likes+1
-    }
-
-    blogService.modify(id,blogObject)
-  }
-
   const handleRemove = () => {
     const id = blog.id
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
@@ -39,7 +25,7 @@ const Blog = ({ blog, user }) => {
 
 
   return (
-    <div>
+    <div className='blog'>
       {showBlog === false ?
         <div style={blogStyle}>
           {blog.title} by {blog.author} <button onClick={toggleShow}>view</button>
