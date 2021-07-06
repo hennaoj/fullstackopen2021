@@ -16,20 +16,21 @@ const create = async newObject => {
   return response.data
 }
 
-const getAll = () => {
-  const request = axios.get(baseUrl)
-  return request.then(response => response.data)
+const getAll = async () => {
+  const request = await axios.get(baseUrl)
+  return request.data
 }
 
-const modify = async (id, newObject) => {
+const modify = (id, newObject) => {
   const config = {
     headers: { Authorization: token },
   }
-  const response = await axios.put(`${baseUrl}/${id}`, newObject, config)
-  return response.data
+  const response = axios.put(`${baseUrl}/${id}`, newObject, config)
+  return response.then(response => response.data)
 }
 
-const destroy = async (id) => {
+const destroy = async (id, user) => {
+  console.log(user)
   const config = {
     headers: { Authorization: token },
   }

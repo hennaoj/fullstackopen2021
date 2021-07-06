@@ -7,12 +7,14 @@ usersRouter.post('/', async (request, response) => {
   console.log('posting')
   const body = request.body
 
+  //ei luoda käyttäjää, jos salasana puuttuu tai on liian lyhyt
   if (body.password === undefined) {
       return response.status(400).json({ error: 'password missing' })
   } else if (body.password.length < 3) {
       return response.status(400).json({ error: 'password too short (min 3 char)' })
   }
 
+  //tehdään bcryptin avulla passwordHash, joka tallennetaan tietokantaan alkup. salasanan sijasta
   const saltRounds = 10
   const passwordHash = await bcrypt.hash(body.password, saltRounds)
 
@@ -29,7 +31,7 @@ usersRouter.post('/', async (request, response) => {
 
 usersRouter.get('/', async (request, response) => {
     const users = await User
-        .find({}).populate('blogs', { url: 1, title: 1, author: 1 })
+        .find({}).populate('blogs', { url: 1, title: 1, author: 1 }) //näyttää käyttäjän lisäämien blogien tiedot
 
     response.json(users.map(u => u.toJSON()))
 })

@@ -18,7 +18,7 @@ const App = () => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs.sort((a,b) => b.likes-a.likes ))
     )
-  },)
+  }, [])
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
@@ -71,6 +71,8 @@ const App = () => {
   }
 
   const createBlog = (blogObject) => {
+    //creates a blog using blogService
+    blogObject.user = user
     blogFormRef.current.toggleVisibility()
 
     blogService
@@ -88,6 +90,13 @@ const App = () => {
           setNotification(null)
         }, 4000)
       })
+
+    setTimeout(() => {
+      blogService.getAll().then(blogs => {
+        console.log(blogs)
+        setBlogs(blogs)
+      })
+    }, 200)
   }
   const blogFormRef = useRef()
 
@@ -98,6 +107,7 @@ const App = () => {
   )
 
   const handleLike = (blog) => {
+    //adds a like to a blog based on its id and uses blogService to update the blog
     const id = blog.id
 
     const blogObject = {
@@ -107,11 +117,30 @@ const App = () => {
       url: blog.url,
       likes: blog.likes+1
     }
+    blogService
+      .modify(id,blogObject).then(returnedBlog => {
+        const newList = blogs.map(blog => blog.id !== id ? blog : returnedBlog)
+        setBlogs(newList)
+      })
+    setTimeout(() => {
+      blogService.getAll().then(blogs =>
+        setBlogs( blogs.sort((a,b) => b.likes-a.likes ))
+      )
+    }, 300)
+  }
 
-    blogService.modify(id,blogObject)
+  const updateBlogs = () => {
+    //called to update blogs when necessary
+    setTimeout(() => {
+      blogService.getAll().then(blogs => {
+        console.log(blogs)
+        setBlogs(blogs)
+      })
+    }, 200)
   }
 
 
+  //is user is not logged in, shows the log in form
   if (user === null) {
     return (
       <div>
@@ -127,6 +156,7 @@ const App = () => {
     )
   }
 
+  //if user is logged in shows a list of blogs and the blogform
   return (
     <div>
       <Notification message={notification} />
@@ -138,7 +168,7 @@ const App = () => {
       <br></br>
       <div>
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} user={user} handleLike={() => handleLike(blog)}/>
+          <Blog key={blog.id} blog={blog} user={user} handleLike={() => handleLike(blog)} updateBlogs={() => updateBlogs()}/>
         )}
       </div>
     </div>

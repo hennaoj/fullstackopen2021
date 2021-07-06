@@ -14,7 +14,7 @@ blogsRouter.post('/', async (request, response, next) => {
   const body = request.body
 
   const decodedtoken = jwt.verify(request.token, process.env.SECRET)
-  
+
   //varmistetaan tokenin oikeellisuus
   if (!request.token || !decodedtoken.id) {
     return response.status(401).json({error: 'token missing or invalid'})
@@ -37,7 +37,7 @@ blogsRouter.post('/', async (request, response, next) => {
   //lisätään blogi myös käyttäjän tietoihin ja tallennetaan käyttäjä
   user.blogs = user.blogs.concat(savedBlog._id)
   await user.save()
-  response.json(savedBlog.toJSON)
+  response.json(savedBlog.toJSON())
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
