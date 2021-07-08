@@ -29,8 +29,7 @@ const modify = (id, newObject) => {
   return response.then(response => response.data)
 }
 
-const destroy = async (id, user) => {
-  console.log(user)
+const destroy = async (id) => {
   const config = {
     headers: { Authorization: token },
   }
