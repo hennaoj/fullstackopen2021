@@ -9,16 +9,15 @@ const notificationReducer = (state=null, action) => {
     }
 }
 
-export const changeNotification = notification => {
-    return {
-        type: 'SET_NOTIFICATION',
-        notification,
-    }
-}
-
-export const nullifyNotification = () => {
-    return {
-        type: 'NULLIFY',
+export const setNotification = (notification, time) => {
+    return async dispatch => {
+        dispatch({
+            type: 'SET_NOTIFICATION',
+            notification: notification,
+        })
+        setTimeout(() => {
+            dispatch({type: 'NULLIFY'})
+        }, time*1000)
     }
 }
 
