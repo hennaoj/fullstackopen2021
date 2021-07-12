@@ -4,7 +4,7 @@ const reducer = (state = [], action) => {
   console.log('state now: ', state)
   console.log('action', action)
   switch(action.type) {
-  case 'VOTE': {
+  case 'VOTE': { //voting adds a vote to the anecdote using its id
     const id = action.data.id
     const anecdoteToChange = state.find(x => x.id === id)
     const changedAnecdote = {
@@ -25,6 +25,7 @@ const reducer = (state = [], action) => {
 }
 
 export const addAnecdote = content => {
+  //adds a new anecdote to the db using anecdoteService
   return async dispatch => {
     const newAnecdote = await anecdoteService.createNew(content)
     dispatch({
@@ -35,6 +36,7 @@ export const addAnecdote = content => {
 }
 
 export const addVote = anecdote => {
+  //handles the voting of an anecdote using anecdoteService
   return async dispatch => {
     const updatedAnecdote = await anecdoteService.voteAnecdote(anecdote)
     dispatch({
@@ -45,6 +47,7 @@ export const addVote = anecdote => {
 }
 
 export const initializeAnecdotes = () => {
+  //fetches the anecdotes from the db using anecdoteService
   return async dispatch => {
     const anecdotes = await anecdoteService.getAll()
     dispatch({

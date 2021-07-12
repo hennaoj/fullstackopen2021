@@ -1,13 +1,14 @@
 import React from 'react'
-import { useDispatch } from 'react-redux'
+import { connect } from 'react-redux'
 import { filterChange } from '../reducers/filterReducer'
 
-const FilterForm = () => {
-  const dispatch = useDispatch()
+const FilterForm = (props) => {
+  //form for setting the filter
 
   const handleChange = (event) => {
+    //handles filter change using the filterChange function
     event.preventDefault()
-    dispatch(filterChange(event.target.value))
+    props.filterChange(event.target.value)
   }
   const style = {
     marginBottom: 20
@@ -20,4 +21,4 @@ const FilterForm = () => {
   )
 }
 
-export default FilterForm
+export default connect(null,{filterChange})(FilterForm)

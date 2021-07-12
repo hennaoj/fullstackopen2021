@@ -9,13 +9,17 @@ const notificationReducer = (state=null, action) => {
     }
 }
 
+let timeout
 export const setNotification = (notification, time) => {
+    if (timeout) { //clears the timeout if notification changes while the previous hasn't nullified yet
+        clearTimeout(timeout)
+    }
     return async dispatch => {
-        dispatch({
+        dispatch({ //setting the notification string as the string received as a parameter
             type: 'SET_NOTIFICATION',
             notification: notification,
         })
-        setTimeout(() => {
+        timeout = setTimeout(() => { //setting notification to null in the time received as a parameter
             dispatch({type: 'NULLIFY'})
         }, time*1000)
     }

@@ -8,7 +8,7 @@ import { useDispatch } from 'react-redux'
 
 const App = () => {
   const dispatch = useDispatch()
-  useEffect(() => {
+  useEffect(() => { //initializing the anecdotes when the app is first launched
     dispatch(initializeAnecdotes())
   }, [dispatch])
 

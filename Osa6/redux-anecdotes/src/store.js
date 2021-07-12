@@ -6,6 +6,8 @@ import { createStore, combineReducers, applyMiddleware } from 'redux'
 import thunk from 'redux-thunk'
 import { composeWithDevTools } from 'redux-devtools-extension'
 
+//creates reducer combining the three reduceres and sets up a store using the combined reducer
+
 const reducer = combineReducers({
     anecdotes: anecdoteReducer,
     notification: notificationReducer,

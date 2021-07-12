@@ -8,6 +8,7 @@ const filterReducer = (state= '', action) => {
   }
   
   export const filterChange = filter => {
+    //changes the filter in the store to a string received as a parameter
       return {
           type: 'SET_FILTER',
           filter,
