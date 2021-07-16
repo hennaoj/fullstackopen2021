@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Link, Switch, Route, useRouteMatch, Redirect } from 'react-router-dom'
+import { useField } from './hooks'
 
 const Menu = () => {
   const padding = {
@@ -67,48 +68,52 @@ const Footer = () => (
 )
 
 const CreateNew = (props) => {
-  const [content, setContent] = useState('')
-  const [author, setAuthor] = useState('')
-  const [info, setInfo] = useState('')
+  const content = useField('text')
+  const author = useField('text')
+  const info = useField('text')
   const [redirect, setRedirect] = useState(false)
 
+  console.log(content.body.value)
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  const handleSubmit = (event) => {
+    event.preventDefault()
     props.addNew({
-      content,
-      author,
-      info,
+      content: content.body.value,
+      author: author.body.value,
+      info: info.body.value,
       votes: 0
     })
-    setContent('')
-    setAuthor('')
-    setInfo('')
     setRedirect(true)
-    props.changeNotif(`new anecdote '${content}' created!`)
+    props.changeNotif(`new anecdote '${content.body.value}' created!`)
   }
 
   if (redirect === true) {
     return <Redirect to='/' />
   }
 
+  const resetInputs = () => {
+    content.reset()
+    author.reset()
+    info.reset()
+  }
+
   return (
     <div>
       <h2>create a new anecdote</h2>
-      <form onSubmit={handleSubmit}>
+      <form>
         <div>
           content
-          <input name='content' value={content} onChange={(e) => setContent(e.target.value)} />
+          <input  {...content.body} />
         </div>
         <div>
           author
-          <input name='author' value={author} onChange={(e) => setAuthor(e.target.value)} />
+          <input {...author.body} />
         </div>
         <div>
           url for more info
-          <input name='info' value={info} onChange={(e)=> setInfo(e.target.value)} />
+          <input {...info.body} />
         </div>
-        <button>create</button>
+        <button onClick={handleSubmit}>create</button> <button onClick={() => resetInputs()}>reset</button>
       </form>
     </div>
   )
