@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
-import blogService from '../services/blogs'
-import { addLike } from '../reducers/blogReducer'
+import { addLike, removeBlog } from '../reducers/blogReducer'
 import { connect } from 'react-redux'
 
-const Blog = ({ blog, user, addLike }) => {
+const Blog = ({ blog, user, addLike, removeBlog }) => {
   const [showBlog, setShowBlog] = useState(false)
 
   const blogStyle = {
@@ -21,11 +20,7 @@ const Blog = ({ blog, user, addLike }) => {
 
 
   const handleRemove = () => {
-    //removes a blog using blogService and the blog's id
-    const id = blog.id
-    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
-      blogService.destroy(id, user)
-    }
+    removeBlog(blog)
   }
 
   return (
@@ -51,4 +46,4 @@ const Blog = ({ blog, user, addLike }) => {
   )
 }
 
-export default connect(null,{ addLike })(Blog)
+export default connect(null,{ addLike, removeBlog })(Blog)

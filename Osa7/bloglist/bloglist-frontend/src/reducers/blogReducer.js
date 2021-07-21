@@ -19,6 +19,13 @@ const reducer = (state = [], action) => {
     return state.map(blog =>
       blog.id !== id ? blog : changedBlog)
   }
+  case 'REMOVE': {
+    const id = action.data.id
+    var filtered = state.filter(function(blog){
+      return blog.id !== id
+    })
+    return filtered
+  }
   default:
     return state
   }
@@ -57,6 +64,16 @@ export const initializeBlogs = () => {
     dispatch({
       type: 'INIT_BLOGS',
       data: blogs,
+    })
+  }
+}
+
+export const removeBlog = blog => {
+  return async dispatch => {
+    await blogService.destroy(blog.id)
+    dispatch({
+      type: 'REMOVE',
+      data: blog
     })
   }
 }
