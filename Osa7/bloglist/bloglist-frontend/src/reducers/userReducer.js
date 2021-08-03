@@ -1,9 +1,10 @@
 import loginService from '../services/login'
 import blogService from '../services/blogs'
+//import { setNotification } from './notificationReducer'
 
 const reducer = (state = null, action) => {
-  console.log('state now: ', state)
-  console.log('action', action)
+  //console.log('state now: ', state)
+  //console.log('action', action)
   switch(action.type) {
   case 'LOGIN':
     return action.data
