@@ -1,20 +1,23 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
+import { connect, useDispatch, useSelector } from 'react-redux'
+import { BrowserRouter, Switch, Route, Link } from 'react-router-dom'
+
 import BlogList from './components/BlogList'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
-import blogService from './services/blogs'
-import loginService from './services/login'
+import UserList from './components/UserList'
+import User from './components/User'
+import BlogInfo from './components/BlogInfo'
 
 import { setNotification } from './reducers/notificationReducer'
 import { initializeBlogs, addBlog } from './reducers/blogReducer'
-import { connect, useDispatch } from 'react-redux'
+import { logoutUser, initUser } from './reducers/userReducer'
 
 const App = (props) => {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [user, setUser] = useState(null)
+
+  const user = useSelector(state => state.user)
 
   const dispatch = useDispatch()
   useEffect(() => { //initializing the anecdotes when the app is first launched
@@ -25,41 +28,15 @@ const App = (props) => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      setUser(user)
-      blogService.setToken(user.token)
+      props.initUser(user)
     }
   }, [])
 
 
   const logout = (event) => {
     event.preventDefault()
-    setUser(null)
-    window.localStorage.clear()
+    props.logoutUser()
     props.setNotification('logout succeeded', 5)
-  }
-
-  const handleLogin = async (event) => {
-    event.preventDefault()
-
-    try {
-      const user = await loginService.login({
-        username, password
-      })
-
-
-      window.localStorage.setItem(
-        'loggedBlogappUser', JSON.stringify(user)
-      )
-      blogService.setToken(user.token)
-      setUser(user)
-      setUsername('')
-      setPassword('')
-      props.setNotification('login succeeded', 5)
-    } catch (exception) {
-      props.setNotification('wrong username or password', 5)
-    }
-
-    console.log('logging in with', username, password)
   }
 
   const blogFormRef = useRef()
@@ -74,35 +51,50 @@ const App = (props) => {
     </Togglable>
   )
 
+  const padding = {
+    padding: 5
+  }
+
   //is user is not logged in, shows the log in form
   if (user === null) {
     return (
       <div>
         <Notification/>
-        <LoginForm
-          username={username}
-          password={password}
-          handleUsernameChange={({ target }) => setUsername(target.value)}
-          handlePasswordChange={({ target }) => setPassword(target.value)}
-          handleSubmit={handleLogin}
-        />
+        <LoginForm/>
       </div>
     )
   }
 
-  //if user is logged in shows a list of blogs and the blogform
+
   return (
-    <div>
-      <Notification/>
-      <h2>blogs</h2>
+    <BrowserRouter>
       <div>
-        {user.name} logged in  <button onClick={logout}>logout</button>
+        <Link style={padding} to="/">blogs</Link>
+        <Link style={padding} to="/users">users</Link>
+        <small>{user.name} logged in </small>
+        <button onClick={logout}>logout</button>
       </div>
-      {blogForm()}
-      <br></br>
-      <BlogList user={user} />
-    </div>
+      <div>
+        <Notification/>
+        <h2>Blog App</h2>
+      </div>
+      <Switch>
+        <Route path="/users/:id">
+          <User />
+        </Route>
+        <Route path='/users'>
+          <UserList />
+        </Route>
+        <Route path="/blogs/:id">
+          <BlogInfo />
+        </Route>
+        <Route path='/'>
+          {blogForm()}
+          <BlogList user={ user } />
+        </Route>
+      </Switch>
+    </BrowserRouter>
   )
 }
 
-export default connect(null,{ setNotification, addBlog })(App)
+export default connect(null,{ setNotification, addBlog, logoutUser, initUser })(App)

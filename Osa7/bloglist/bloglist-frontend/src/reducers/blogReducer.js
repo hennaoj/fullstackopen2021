@@ -26,6 +26,12 @@ const reducer = (state = [], action) => {
     })
     return filtered
   }
+  case 'COMMENT': {
+    console.log(action.data)
+    const id = action.data.id
+    return state.map(blog =>
+      blog.id !== id ? blog : action.data)
+  }
   default:
     return state
   }
@@ -52,6 +58,20 @@ export const addLike = blog => {
     const updatedBlog = await blogService.modify(blog.id, changedBlog)
     dispatch({
       type: 'LIKE',
+      data: updatedBlog
+    })
+  }
+}
+
+export const addComments = (blog, comment) => {
+  const changedBlog = {
+    ...blog,
+    comments: blog.comments.concat(comment)
+  }
+  return async dispatch => {
+    const updatedBlog = await blogService.comment(blog.id, changedBlog)
+    dispatch({
+      type: 'COMMENT',
       data: updatedBlog
     })
   }

@@ -21,6 +21,14 @@ const getAll = async () => {
   return request.data
 }
 
+const comment = (id, blogObject) => {
+  const config = {
+    headers: { Authorization: token },
+  }
+  const response = axios.post(`${baseUrl}/${id}`, blogObject, config)
+  return response.then(response => response.data)
+}
+
 const modify = (id, newObject) => {
   const config = {
     headers: { Authorization: token },
@@ -37,5 +45,5 @@ const destroy = async (id) => {
   return response.data
 }
 
-const functionsToExport = { getAll, setToken, create, modify, destroy }
+const functionsToExport = { getAll, setToken, create, modify, destroy, comment }
 export default functionsToExport
