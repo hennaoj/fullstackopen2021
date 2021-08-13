@@ -81,12 +81,10 @@ const resolvers = {
     allBooks: async (root, args) => {
       const books = await Book.find({}).populate('author')
       //console.log(books)
-      if (!args.genre) {
-        return books
+      if (args.genre) {
+        return books.filter(book => book.genres.includes(args.genre))
       }
-      const booksByGenre = books.filter(book => book.genres.includes(args.genre))
-
-      return booksByGenre
+      return books
     },
     allAuthors: () => {
       return Author.find({})
@@ -153,7 +151,6 @@ const resolvers = {
     },
     editAuthor: async (root, args, context) => {
       const author = await Author.findOne({ name: args.name }) 
-
       const currentUser = context.currentUser
 
       if (!currentUser) {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useMutation, useQuery } from '@apollo/client'
 
 import { CHANGE_BORN, ALL_AUTHORS, ALL_BOOKS } from '../queries'
@@ -12,7 +12,13 @@ const SetBirth = (props) => {
   })
 
   const result = useQuery(ALL_AUTHORS)
+
   const authors = result.data.allAuthors
+
+  useEffect(() => {
+    setAuthor(authors[0].name)
+  }, [setAuthor, authors])
+
 
   if (!props.show) {
     return null
@@ -33,7 +39,7 @@ const SetBirth = (props) => {
       <form onSubmit={submit}>
         <select value={author} onChange={({ target }) => setAuthor(target.value)}>
           {authors.map(author =>
-            <option value={author.name}>{author.name}</option>
+            <option key={author.id} value={author.name}>{author.name}</option>
           )}
         </select>
         <div>
