@@ -17,7 +17,7 @@ const Recommended = (props) => {
 
   var books = result.data.allBooks
   var genre = favResult.data.me.favoriteGenre
-  console.log(genre)
+  //console.log(genre)
 
   books = books.filter(book => book.genres.includes(genre))
 

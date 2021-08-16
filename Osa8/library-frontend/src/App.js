@@ -5,7 +5,8 @@ import NewBook from './components/NewBook'
 import LoginForm from './components/LoginForm'
 import SetBirth from './components/SetBirth'
 import Recommended from './components/Recommended'
-import { useApolloClient } from '@apollo/client'
+import { useApolloClient, useSubscription } from '@apollo/client'
+import { BOOK_ADDED, ALL_BOOKS, ALL_AUTHORS } from './queries'
 
 const App = () => {
   const [page, setPage] = useState('authors')
@@ -17,6 +18,39 @@ const App = () => {
     localStorage.clear()
     client.resetStore()
   }
+
+  const updateCacheWith = (addedBook) => {
+    const includedIn = (set, object) => 
+      set.map(p => p.id).includes(object.id)  
+
+    //lisätään kirja, jos sitä ei ole jo välimuistissa
+    const bookDataInStore = client.readQuery({ query: ALL_BOOKS })
+    if (!includedIn(bookDataInStore.allBooks, addedBook)) {
+      client.writeQuery({
+        query: ALL_BOOKS,
+        data: { allBooks: bookDataInStore.allBooks.concat(addedBook) }
+      })
+    }
+    //lisätään kirjailija, jos sitä ei ole jo välimuistissa
+    const authorDataInStore = client.readQuery({ query: ALL_AUTHORS })
+    if (!includedIn(authorDataInStore.allAuthors, addedBook.author)) {
+      client.writeQuery({
+        query: ALL_AUTHORS,
+        data: { allAuthors: authorDataInStore.allAuthors.concat(addedBook.author) }
+      })
+    }
+  }
+
+  //päivitetään välimuisti, jos kirja lisätty
+  useSubscription(BOOK_ADDED, {
+    onSubscriptionData: ({ subscriptionData }) => {
+      const addedBook = subscriptionData.data.bookAdded
+      setTimeout(function() {
+        window.alert(`${addedBook.title} added`)
+        }, 100)
+      updateCacheWith(addedBook)
+    }
+  })
 
   return (
     <div>

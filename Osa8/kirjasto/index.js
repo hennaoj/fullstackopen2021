@@ -6,6 +6,9 @@ const Author = require('./models/author')
 const User = require('./models/user')
 const mongoose = require('mongoose')
 
+const { PubSub } = require('apollo-server')
+const pubsub = new PubSub()
+
 const MONGODB_URI = process.env.MONGODB_URI
 
 const jwt = require('jsonwebtoken')
@@ -72,6 +75,9 @@ const typeDefs = gql`
       password: String!
     ): Token
   }
+  type Subscription {
+    bookAdded: Book!
+  } 
 `
 
 const resolvers = {
@@ -147,6 +153,9 @@ const resolvers = {
         await Book.findByIdAndDelete(book.id)
         throw new ValidationError(error.message)
       }
+
+      pubsub.publish('BOOK_ADDED', { bookAdded: book })
+
       return book
     },
     editAuthor: async (root, args, context) => {
@@ -189,7 +198,12 @@ const resolvers = {
   
       return { value: jwt.sign(userForToken, JWT_SECRET) }
     },
-  }
+  },
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterator(['BOOK_ADDED'])
+    },
+  },
 }
 
 const server = new ApolloServer({
@@ -202,12 +216,13 @@ const server = new ApolloServer({
         auth.substring(7), JWT_SECRET
       )
       const currentUser = await User
-        .findById(decodedToken.id).populate('friends')
+        .findById(decodedToken.id)
       return { currentUser }
     }
   }
 })
 
-server.listen().then(({ url }) => {
+server.listen().then(({ url, subscriptionsUrl }) => {
   console.log(`Server ready at ${url}`)
+  console.log(`Subscriptions ready at ${subscriptionsUrl}`)
 })

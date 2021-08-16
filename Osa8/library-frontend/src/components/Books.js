@@ -17,6 +17,7 @@ const Books = (props) => {
 
   var books = result.data.allBooks
   const genres = []
+  //haetaan uniikit genret käymällä kirjat läpi
   books.map(book => book.genres.filter(genre => {
       if (!genres.includes(genre)) {
         genres.push(genre)
@@ -26,6 +27,7 @@ const Books = (props) => {
     })
   )
 
+  //jos genre on valittu, filtteröidään kirjat sen mukaan
   if (genre) {
     books = books.filter(book => book.genres.includes(genre))
   }
