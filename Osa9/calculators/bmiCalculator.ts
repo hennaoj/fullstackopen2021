@@ -23,7 +23,7 @@ const parseArguments = (args: Array<string>): Stats => {
   }
 }
 
-const calculateBmi = (height: number, weight: number) => {
+export const calculateBmi = (height: number, weight: number) => {
   const bmi: number = Math.round(( weight / (height/100) ** 2 )*10)/10;
   //console.log(bmi);
   if (bmi<16) {
@@ -40,7 +40,7 @@ const calculateBmi = (height: number, weight: number) => {
     return 'Obese (Class I)';
   } else if (bmi >= 35 && bmi < 39.9) {
     return 'Obese (Class II)';
-  } else if (bmi >= 40) {
+  } else {
     return 'Obese (Class III)';
   }
 }

@@ -42,7 +42,8 @@ const parseExerciseArguments = (args: Array<string>): Inputs => {
 const calculateExercises = (exerciseHours: number[], targetHours: number): exerciseResults => {
   const length: number = exerciseHours.length;
   const days: number[] = exerciseHours.filter(hours => {
-    if (hours > 0) {return hours};
+    if (hours > 0) {return hours}
+    return null;
   })
   const total: number = exerciseHours.reduce((a, b) => a + b, 0);
   const average: number = Math.round(total/length * 100) / 100;
