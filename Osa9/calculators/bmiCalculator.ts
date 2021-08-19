@@ -8,20 +8,20 @@ const parseArguments = (args: Array<string>): Stats => {
   if (args.length > 4) throw new Error('Too many arguments');
 
   if (!isNaN(Number(args[2])) && !isNaN(Number(args[3]))) {
-    const height: number = Number(args[2]);
-    const weight: number = Number(args[3]);
+    const height = Number(args[2]);
+    const weight = Number(args[3]);
     if (height > 140 && height < 230 && weight > 30 && weight < 200) {
       return {
         height: height,
         weight: weight
-      }
+      };
     } else {
       throw new Error('Height should be between 140 and 230 centimeters and weight between 30 and 200 kilograms!');
     }
   } else {
     throw new Error('Provided values were not numbers!');
   }
-}
+};
 
 export const calculateBmi = (height: number, weight: number) => {
   const bmi: number = Math.round(( weight / (height/100) ** 2 )*10)/10;
@@ -43,11 +43,13 @@ export const calculateBmi = (height: number, weight: number) => {
   } else {
     return 'Obese (Class III)';
   }
-}
+};
 
 try {
   const { height, weight } = parseArguments(process.argv);
   console.log(calculateBmi(height, weight));
 } catch (error) {
-  console.log('Error, message: ', error.message);
+  if (error instanceof Error) {
+    console.log('Error, message: ', error.message);
+  }
 }

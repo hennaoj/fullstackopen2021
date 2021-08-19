@@ -3,7 +3,7 @@ interface Inputs {
   hours: number[];
 }
 
-interface exerciseResults {
+export interface exerciseResults {
   periodLength: number;
   trainingDays: number;
   average: number;
@@ -16,14 +16,14 @@ interface exerciseResults {
 const parseExerciseArguments = (args: Array<string>): Inputs => {
   if (args.length < 4) throw new Error('Not enough arguments');
 
-  var target: number;
+  let target: number;
   if (!isNaN(Number(args[2]))) {
     target = Number(args[2]);
   } else {
     throw new Error('Provided values were not numbers');
   }
  
-  var exerHours: number[] = [];
+  const exerHours: number[] = [];
   for (let i = 3; i < args.length; i++) {
     if (!isNaN(Number(args[i]))) {
       exerHours.push(Number(args[i]));
@@ -35,26 +35,28 @@ const parseExerciseArguments = (args: Array<string>): Inputs => {
   return {
     target: target,
     hours: exerHours
-  }
+  };
 
-}
+};
 
-const calculateExercises = (exerciseHours: number[], targetHours: number): exerciseResults => {
+export const calculateExercises = (exerciseHours: number[], targetHours: number): exerciseResults => {
   const length: number = exerciseHours.length;
   const days: number[] = exerciseHours.filter(hours => {
-    if (hours > 0) {return hours}
+    if (hours > 0) {
+      return hours;
+    }
     return null;
-  })
+  });
   const total: number = exerciseHours.reduce((a, b) => a + b, 0);
   const average: number = Math.round(total/length * 100) / 100;
-  var success: boolean = false;
-  var rating: number = 1;
-  var ratingDesc: string = 'not good at all';
+  let success = false;
+  let rating = 1;
+  let ratingDesc = 'not good at all';
   if (average >= targetHours) {
     success = true;
     rating = 3;
     ratingDesc = 'excellent work!';
-  } else if (average >= 0.6 * targetHours) {
+  } else if (average >= 0.5 * targetHours) {
     rating = 2;
     ratingDesc = 'not too bad but could be better';
   }
@@ -67,12 +69,14 @@ const calculateExercises = (exerciseHours: number[], targetHours: number): exerc
     success: success,
     rating: rating,
     ratingDescription: ratingDesc
-  }
-}
+  };
+};
 
 try {
   const { target, hours } = parseExerciseArguments(process.argv);
   console.log(calculateExercises(hours, target));
 } catch (error) {
-  console.log('Error, message: ', error.message);
+  if (error instanceof Error) {
+    console.log('Error, message: ', error.message);
+  }
 }
