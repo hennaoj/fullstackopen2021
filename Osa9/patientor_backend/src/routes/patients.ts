@@ -9,6 +9,10 @@ router.get('/', (_req, res) => {
   res.send(patientService.getNonSensitivePatients());
 });
 
+router.get('/:id', (req, res) => {
+  res.send(patientService.getPatientData(req.params.id));
+});
+
 router.post('/', (req, res) => {
   try {
     //first checking that the req.body values are in correct format using toNewPatient
