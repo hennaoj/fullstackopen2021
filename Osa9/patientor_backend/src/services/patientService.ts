@@ -25,7 +25,7 @@ const addPatient = (entry: NewPatient): Patient => {
 
 const getPatientData = (id: string) => {
   const patient = patients.find(patient => patient.id === id);
-  return patient ? { ...patient, entries: [] }: null ;
+  return patient;
 };
 
 export default {

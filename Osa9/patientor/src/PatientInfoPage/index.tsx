@@ -2,12 +2,13 @@ import React from "react";
 import axios from "axios";
 import fetchedPatients from "../fetchedPatients";
 
-import { Patient } from "../types";
+import { Patient, Entry } from "../types";
 import { apiBaseUrl } from "../constants";
 import { useParams } from "react-router-dom";
 import { useStateValue, updatePatient } from "../state";
-import { Icon } from "semantic-ui-react";
+import { Card, Icon } from "semantic-ui-react";
 import { SemanticICONS } from "semantic-ui-react/dist/commonjs/generic";
+import EntryDetails from "../components/EntryDetails";
 
 const PatientInfoPage = () => {
 
@@ -16,6 +17,7 @@ const PatientInfoPage = () => {
   
   const patientToShow = Object.values(patients).find((patient: Patient) => patient.id === id);
   const gender = patientToShow?.gender;
+  const entries = patientToShow?.entries;
 
   React.useEffect(() => {
     const fetchPatient = async () => {
@@ -52,6 +54,14 @@ const PatientInfoPage = () => {
         <h2>{patientToShow.name}<Icon name={icon}/></h2>
         <p>ssn: {patientToShow.ssn}</p>
         <p>occupation: {patientToShow.occupation}</p>
+        <h3>entries</h3>
+        {entries && Object.values(entries).map((entry: Entry ) => {
+          return (
+            <Card.Group key={entry.id}>
+            <EntryDetails entry={entry} />
+            </Card.Group>
+          ); 
+        })}
       </div>
     );
   }
