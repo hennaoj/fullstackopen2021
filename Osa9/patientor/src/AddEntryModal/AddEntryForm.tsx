@@ -45,6 +45,7 @@ export const AddEntryForm = ({ onHospitalEntrySubmit, onHealthCheckSubmit, onOcc
       validate={values => {
         const requiredError = "Field is required";
         const errors: { [field: string]: string } = {};
+        const dischargeErrors: { discharge: { [field: string]: string  }} = { discharge: {} };
         if (!values.date) {
           errors.date = requiredError;
         }
@@ -57,12 +58,21 @@ export const AddEntryForm = ({ onHospitalEntrySubmit, onHealthCheckSubmit, onOcc
         if (!values.type) {
           errors.type = requiredError;
         }
+        if (!values.discharge.date) {
+          dischargeErrors.discharge.date = requiredError;
+        }
+        if (!values.discharge.criteria) {
+          dischargeErrors.discharge.criteria = requiredError;
+        }
         setType(values.type);
-        //console.log(values);
+        if (dischargeErrors.discharge.date || dischargeErrors.discharge.criteria) {
+          return { ...errors, ...dischargeErrors};
+        }
         return errors;
       }}
     >
       {({ isValid, dirty, setFieldValue, setFieldTouched }) => {
+        console.log(isValid, dirty);
         return (
           <Form className="form ui">
             <SelectField
@@ -140,6 +150,7 @@ export const AddEntryForm = ({ onHospitalEntrySubmit, onHealthCheckSubmit, onOcc
         onSubmit={onHealthCheckSubmit}
         validate={values => {
           const requiredError = "Field is required";
+          const ratingError = "Rating must be between 0-3";
           const errors: { [field: string]: string } = {};
           if (!values.date) {
             errors.date = requiredError;
@@ -153,12 +164,19 @@ export const AddEntryForm = ({ onHospitalEntrySubmit, onHealthCheckSubmit, onOcc
           if (!values.type) {
             errors.type = requiredError;
           }
+          if (values.healthCheckRating < 0 ||values.healthCheckRating > 3) {
+            errors.healthCheckRating = ratingError;
+          }
+          if (!values.healthCheckRating && values.healthCheckRating !== 0) {
+            errors.healthCheckRating = requiredError;
+          }
           setType(values.type);
-          //console.log(type);
+          console.log(errors);
           return errors;
         }}
       >
         {({ isValid, dirty, setFieldValue, setFieldTouched }) => {
+          console.log(isValid, dirty);
           return (
             <Form className="form ui">
               <SelectField
@@ -244,12 +262,16 @@ export const AddEntryForm = ({ onHospitalEntrySubmit, onHealthCheckSubmit, onOcc
           if (!values.type) {
             errors.type = requiredError;
           }
+          if (!values.employerName) {
+            errors.employerName = requiredError;
+          }
           setType(values.type);
           //console.log(type);
           return errors;
         }}
       >
         {({ isValid, dirty, setFieldValue, setFieldTouched }) => {
+          console.log(isValid, dirty);
           return (
             <Form className="form ui">
               <SelectField

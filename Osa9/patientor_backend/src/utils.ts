@@ -165,7 +165,7 @@ export const toNewHealthCheckEntry = ({ description, date, specialist, diagnosis
     type: "HealthCheck",
     healthCheckRating: parseRating(healthCheckRating)
   };
-  if (diagnosisCodes) {
+  if (diagnosisCodes && diagnosisCodes !== []) {
     newEntryToAdd.diagnosisCodes = parseDiagnosisCodes(diagnosisCodes);
   }
   return newEntryToAdd;
@@ -184,7 +184,7 @@ export const toNewHospitalEntry = ({ description, date, specialist, diagnosisCod
     type: "Hospital",
     discharge: parseDischarge(discharge)
   };
-  if (diagnosisCodes) {
+  if (diagnosisCodes && diagnosisCodes !== []) {
     newEntryToAdd.diagnosisCodes = parseDiagnosisCodes(diagnosisCodes);
   }
   return newEntryToAdd;
@@ -203,10 +203,10 @@ export const toNewOccupationalEntry = ({ description, date, specialist, diagnosi
     type: "OccupationalHealthcare",
     employerName: parseName(employerName)
   };
-  if (diagnosisCodes) {
+  if (diagnosisCodes && diagnosisCodes !== []) {
     newEntryToAdd.diagnosisCodes = parseDiagnosisCodes(diagnosisCodes);
   }
-  if (sickLeave) {
+  if (Array.isArray(sickLeave) && sickLeave[0] !== '' && sickLeave[1] !== '' ) {
     newEntryToAdd.sickLeave = parseSickLeave(sickLeave);
   }
   return newEntryToAdd;
