@@ -216,6 +216,7 @@ export const toNewOccupationalEntry = ({ description, date, specialist, diagnosi
 type EntryFields = {description : unknown, date : unknown, specialist : unknown, diagnosisCodes? : unknown, type : unknown, discharge? : unknown, healthCheckRating? : unknown, employerName? : unknown, sickLeave? : unknown};
 
 export const toNewEntry = ({ description, date, specialist, diagnosisCodes, type, discharge, healthCheckRating, employerName, sickLeave }: EntryFields): NewEntry | undefined => {
+  //a function that calls entry validation functions depending on the type given as a parameter
   parseType(type);
   if (type === 'HealthCheck') {
     return toNewHealthCheckEntry({ description: description, date: date, specialist: specialist, diagnosisCodes: diagnosisCodes, type: type, healthCheckRating: healthCheckRating });

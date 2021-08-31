@@ -12,22 +12,28 @@ export type HealthCheckEntryFormValues = Omit<HealthCheckEntry, "id" >;
 export type HospitalEntryFormValues = Omit<HospitalEntry, "id" >;
 export type OccupationalEntryFormValues = Omit<OccupationalHealthcareEntry, "id" >;
 
-interface Props {
+export interface Props {
+  //differenciating the submit functions for each formvalue type
   onHealthCheckSubmit: (values: HealthCheckEntryFormValues) => void;
   onHospitalEntrySubmit: (values: HospitalEntryFormValues) => void;
   onOccupationalEntrySubmit: (values: OccupationalEntryFormValues) => void;
   onCancel: () => void;
 }
 
-const typeOptions: TypeOption[] = [
+export const typeOptions: TypeOption[] = [
   { value: Type.Hospital, label: "Hospital" },
   { value: Type.HealthCheck, label: "HealthCheck" },
   { value: Type.OccupationalHealth, label: "OccupationalHealthcare" }
 ];
 
 export const AddEntryForm = ({ onHospitalEntrySubmit, onHealthCheckSubmit, onOccupationalEntrySubmit, onCancel } : Props ) => {
-  const [{ diagnoses }] = useStateValue();
-  const [ type, setType ] = useState('Hospital');
+  //returns an entry form, using type to define which form is returned. if the user changes the type,
+  //the form changes as well
+
+  const [{ diagnoses }] = useStateValue(); //fetching diagnoses from the state
+  const [ type, setType ] = useState('Hospital'); //the type is 'Hospital' at first
+
+  //using conditional return to change the form based on the selected type
   if (type === 'Hospital') {
   return (
     <Formik
@@ -65,6 +71,8 @@ export const AddEntryForm = ({ onHospitalEntrySubmit, onHealthCheckSubmit, onOcc
           dischargeErrors.discharge.criteria = requiredError;
         }
         setType(values.type);
+        //returning dischargeErrors only if there actually are error messages
+        //otherwise claims isValid is false beacause of the empty discharge array
         if (dischargeErrors.discharge.date || dischargeErrors.discharge.criteria) {
           return { ...errors, ...dischargeErrors};
         }
@@ -72,7 +80,7 @@ export const AddEntryForm = ({ onHospitalEntrySubmit, onHealthCheckSubmit, onOcc
       }}
     >
       {({ isValid, dirty, setFieldValue, setFieldTouched }) => {
-        console.log(isValid, dirty);
+        //console.log(isValid, dirty);
         return (
           <Form className="form ui">
             <SelectField
@@ -168,15 +176,17 @@ export const AddEntryForm = ({ onHospitalEntrySubmit, onHealthCheckSubmit, onOcc
             errors.healthCheckRating = ratingError;
           }
           if (!values.healthCheckRating && values.healthCheckRating !== 0) {
+            //healthCheckRating set to 0 causes an error for some reason so had to add
+            //a check for that case as well
             errors.healthCheckRating = requiredError;
           }
           setType(values.type);
-          console.log(errors);
+          //console.log(errors);
           return errors;
         }}
       >
         {({ isValid, dirty, setFieldValue, setFieldTouched }) => {
-          console.log(isValid, dirty);
+          //console.log(isValid, dirty);
           return (
             <Form className="form ui">
               <SelectField
@@ -271,7 +281,7 @@ export const AddEntryForm = ({ onHospitalEntrySubmit, onHealthCheckSubmit, onOcc
         }}
       >
         {({ isValid, dirty, setFieldValue, setFieldTouched }) => {
-          console.log(isValid, dirty);
+          //console.log(isValid, dirty);
           return (
             <Form className="form ui">
               <SelectField

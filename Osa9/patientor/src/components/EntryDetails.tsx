@@ -11,13 +11,18 @@ const assertNever = (value: never): never => {
 };
 
 const EntryDetails = ({entry}: {entry: Entry}) => {
-  let icon: SemanticICONS;
-  const [{ diagnoses }] = useStateValue();
+  //returns all details of an entry, specifying the type with a semanticicons icon
 
+  let icon: SemanticICONS;
+  const [{ diagnoses }] = useStateValue(); //fetching the diagnoses from the state to find the diagnoses matching to the entry codes
+
+  //using switch case for different entry types to get all needed attributes
   switch (entry.type) {
     case "HealthCheck":
       const healthRating: SemanticICONS = 'heart';
       let color: SemanticCOLORS;
+
+      //using a heart icon's color to show the health rating
       if (entry.healthCheckRating === 0) {
         color = 'green';
       } else if (entry.healthCheckRating === 1) {

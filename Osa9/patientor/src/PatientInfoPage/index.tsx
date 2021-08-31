@@ -24,6 +24,8 @@ const PatientInfoPage = () => {
   };
 
   const submitNewEntry = async (values: EntryFormValues) => {
+    //posting all of the values received (this could include extra values if different
+    //forms were opened before sending, but the needed values are chosen in the backend) as an entry
       try {
         await axios.post<Entry>(
           `${apiBaseUrl}/patients/${id}/entries`,
@@ -34,7 +36,7 @@ const PatientInfoPage = () => {
         console.error(e.response?.data || 'Unknown Error');
         setError(e.response?.data?.error || 'Unknown error');
       }
-    console.log(values);
+    //console.log(values);
     closeModal();
     const fetchPatient = async () => {
       try {
@@ -46,6 +48,7 @@ const PatientInfoPage = () => {
         console.error(e);
       }
     };
+    //updating the patient so that the new entry shows up on the patient info page straight away
     void fetchPatient();
   };
 
